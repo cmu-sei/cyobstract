@@ -64,7 +64,7 @@ Install Python 2.7 or 3.6.
 Clone the repository:
 
 ```bash
-$ git clone [update the link after we post the project on SEI Github]
+$ git clone https://github.com/cmu-sei/cyobstract.git
 ```
 
 If you do not have pandas, install it with `pip install pandas`.
