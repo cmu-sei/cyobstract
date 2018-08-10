@@ -1,0 +1,276 @@
+# Note: these are ordered highest frequency first
+
+# 40427
+phish     phishing
+phishes   phishing
+phished   phishing
+phishing  phishing
+
+# 23410
+compromise   compromise
+compromised  compromise
+compromises  compromise
+compromising compromise
+
+# 20139
+infect    infection
+infects   infection
+infected  infection
+infection infection
+infecting infection
+
+# 18209
+scan     scanning
+#scans   # results in too many hits
+scanned  scanning
+scanning scanning
+
+# 12068
+inject    injection attack
+injects   injection attack
+injection injection attack
+
+# 11077
+trojan trojan
+
+# 7155
+fraud      fraud
+fraudulent fraud
+fraudster  fraud
+defraud    fraud
+defrauds   fraud
+defrauded  fraud
+defrauding fraud
+
+# 5865
+beacon    beaconing
+beaconed  beaconing
+beaconing beaconing
+
+# 5664
+d/?dos                              DDoS
+distributed\s+denial\s+of\s+service DDoS
+
+# 5130
+#exploit # picks up malware labels
+exploits     exploit
+exploited    exploit
+exploiting   exploit
+exploitation exploit
+
+# 5015
+c2                      C2
+cnc                     C2
+c&c                     C2
+command\s+and\s+control C2
+command\s+&\s+control   C2
+
+# 4771
+#delete  # ignore instructions to delete things
+deletes  deletion
+deleted  deletion
+deleting deletion
+deletion deletion
+
+# 4487
+identity[\s\-]+theft identity theft
+
+# 4278
+bot           botnet
+bot[\s\-]*net botnet
+
+# 3887
+wipe   wiping
+wiped  wiping
+wiping wiping
+
+# 3743
+redirect    redirect
+redirects   redirect
+redirecting redirect
+redirection redirect
+
+# 3693
+spear[\s\-]*phish    spear phishing
+spear[\s\-]*phisher  spear phishing
+spear[\s\-]*phishes  spear phishing
+spear[\s\-]*phished  spear phishing
+spear[\s\-]*phishing spear phishing
+
+# 3191
+hack    hacking
+hacks   hacking
+hacked  hacking
+hacking hacking
+hacker  hacking
+hackers hacking
+
+# 3135
+xss                            cross-site scripting
+cross[\s\-]site[\s\-]scripting cross-site scripting
+
+# 2949
+dos                   DoS
+denial\s+of\s+service DoS
+
+# 2500
+exploit[\s\-]kit exploit kit
+
+# 2441
+spam     spam
+spams    spam
+spammed  spam
+spammer  spam
+spamming spam
+
+# 2372
+worm worm
+
+# 2293
+sink[\s\-]?hole sinkhole
+
+# 2008
+spoof    spoofing
+spoofs   spoofing
+spoofed  spoofing
+spoofer  spoofing
+spoofing spoofing
+
+# 1936
+downloader              downloader
+trojan[\s\-]*downloader downloader
+
+# 1718
+ransom     ransomware
+ransoms    ransomware
+ransomed   ransomware
+ransomer   ransomware
+ransoming  ransomware
+ransomware ransomware
+
+# 1714
+key(?:board)?[\s\-]*log     keylogger
+key(?:board)?[\s\-]*logged  keylogger
+key(?:board)?[\s\-]*logger  keylogger
+key(?:board)?[\s\-]*logging keylogger
+
+# 1654
+social[\s\-]+engineering social engineering
+
+# 1418
+adware adware
+
+# 1387
+deface     defacement
+defaces    defacement
+defaced    defacement
+defacement defacement
+
+# 991
+back[\s\-]*door  backdoor
+back[\s\-]*doors backdoor
+
+# 754
+spy            spyware
+spy[\s\-]*ware spyware
+
+# 657
+amplify       amplification attack
+amplifies     amplification attack
+amplification amplification attack
+reflection    amplification attack
+reflective    amplification attack
+DRDoS         amplification attack
+
+# 580
+probe   probe
+#probes # results in too many hits
+probed  probe
+probing probe
+
+# 573
+root[\s\-]*kit rootkit
+
+# 503
+exfiltrate   exfiltration
+exfiltrates  exfiltration
+exfiltrated  exfiltration
+exfiltration exfiltration
+
+# 393
+#encrypt
+#encrypted
+encrypts   encryption
+encrypting encryption
+
+# 354
+dropper              dropper
+trojan[\s\-]*dropper dropper
+
+# 339
+0[\s\-]day    zero-day
+zero[\s\-]day zero-day
+
+# 291
+password[\s\-]*steal(?:er)?          password stealer
+steals?\s+(?:(?:the|a)\s+)?password  password stealer
+stolen?\s+(?:(?:the|a)\s+)?password  password stealer
+stealing\s+(?:(?:the|a)\s+)?password password stealer
+pws                                  password stealer
+psw                                  password stealer
+
+# 286
+click[\s\-]*fraud clickfraud
+clicker           clickfraud
+
+# 277
+tor TOR
+
+# 201
+notifier              notifier
+trojan[\s\-]*notifier notifier
+
+# 187
+crack    cracking
+cracks   cracking
+cracked  cracking
+cracker  cracking
+cracking cracking
+
+# 184
+mbr                    MBR
+master\s+boot\s+record MBR
+boot\s+sector          MBR
+
+# 145
+erase   erasing
+erases  erasing
+erasing erasing
+
+# 61
+spy            spying
+spies          spying
+spying         spying
+
+# 37
+infiltrates  infiltration
+infiltration infiltration
+infiltrating infiltration
+infiltrator  infiltration
+infiltrate   infiltration
+
+# 28
+sniff    sniffing
+sniffs   sniffing
+sniffer  sniffing
+sniffed  sniffing
+sniffing sniffing
+
+# 13
+whale   whaling
+whaled  whaling
+whaling whaling
+
+# 1
+dials  dialer
+dialer dialer

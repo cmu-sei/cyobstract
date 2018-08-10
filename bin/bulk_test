@@ -1,0 +1,232 @@
+#!/bin/env python
+#
+# Information Discovery
+# 
+# Copyright 2018 Carnegie Mellon University. All Rights Reserved.
+# 
+# NO WARRANTY. THIS CARNEGIE MELLON UNIVERSITY AND SOFTWARE ENGINEERING
+# INSTITUTE MATERIAL IS FURNISHED ON AN "AS-IS" BASIS. CARNEGIE MELLON
+# UNIVERSITY MAKES NO WARRANTIES OF ANY KIND, EITHER EXPRESSED OR
+# IMPLIED, AS TO ANY MATTER INCLUDING, BUT NOT LIMITED TO, WARRANTY OF
+# FITNESS FOR PURPOSE OR MERCHANTABILITY, EXCLUSIVITY, OR RESULTS
+# OBTAINED FROM USE OF THE MATERIAL. CARNEGIE MELLON UNIVERSITY DOES NOT
+# MAKE ANY WARRANTY OF ANY KIND WITH RESPECT TO FREEDOM FROM PATENT,
+# TRADEMARK, OR COPYRIGHT INFRINGEMENT.
+#
+# Released under a BSD-style license, please see LICENSE.txt or contact
+# permission@sei.cmu.edu for full terms.
+#
+# [DISTRIBUTION STATEMENT A] This material has been approved for public
+# release and unlimited distribution. Please see Copyright notice for
+# non-US Government use and distribution.
+#
+# CERT is registered in the U.S. Patent and Trademark Office by
+# Carnegie Mellon University.
+#
+# DM18-0345
+
+from __future__ import print_function
+from builtins import next
+from builtins import str
+from past.builtins import basestring
+
+import os, sys, re
+from datetime import datetime
+from glob import glob
+from argparse import ArgumentParser
+import pandas as pd
+from progress.bar import Bar
+from multiprocessing import Pool
+from io import open
+
+import smoke
+from smoke import db
+from cyobstract import extract
+
+parser = ArgumentParser(description="Test regexes on the entire corpus.")
+parser.add_argument("--dump", action="store_const", const=True,
+                              help="Print the last two result sets")
+parser.add_argument("--full-dump", action="store_const", const=True,
+                                   help="Print all result sets")
+parser.add_argument("--save", action="store_const", const=True,
+                              help="Force save of extraction results")
+parser.add_argument("--revert", action="store_const", const=True,
+                              help="Roll back last state change")
+parser.add_argument("--linear", action="store_const", const=True,
+                              help="Disable parallel processing")
+args = parser.parse_args()
+
+stats_csv = os.path.join(smoke.dat_dir, "bulk.csv")
+
+run_time = datetime.now().strftime("%Y%m%dT%H%M%S")
+extract_dir = os.path.join(smoke.dat_dir, "extractions")
+save_dir = os.path.join(extract_dir, run_time)
+save_cur_link = os.path.join(extract_dir, "current")
+save_last_link = os.path.join(extract_dir, "previous")
+tmp_save_dir = os.path.join(smoke.tmp_dir, "extractions")
+
+def apply_extract(entry):
+    iid, text = entry
+    result = []
+    if text:
+        # decode &amp; and the like
+        text = extract.decode_entities(text)
+        for typ, regex in extract.regexes.items():
+            if callable(regex):
+                matches = regex(text)
+            else:
+                matches = regex.findall(text)
+            for m in matches:
+                if not isinstance(m, basestring):
+                    m = m[0]
+                result.append((typ, m))
+    return iid, result
+
+def _zapdir(d):
+    for f in glob("%s/*" % d):
+        os.unlink(f)
+    os.rmdir(d)
+    
+def revert():
+    dirs = sorted([d for d in os.listdir(extract_dir) \
+                   if os.path.isdir(os.path.join(extract_dir, d)) \
+                   and not os.path.islink(os.path.join(extract_dir, d))])
+    if len(dirs) <= 2:
+        return
+    zap = dirs[-1]
+    new_current = dirs[-2]
+    new_last = dirs[-3]
+    if os.path.lexists(save_cur_link):
+        os.unlink(save_cur_link)
+    if os.path.lexists(save_last_link):
+        os.unlink(save_last_link)
+    _zapdir(os.path.join(extract_dir, zap))
+    os.symlink(new_current, save_cur_link)
+    os.symlink(new_last, save_last_link)
+    if os.path.exists(stats_csv):
+        stats = pd.read_csv(stats_csv, index_col=0)
+        stats.drop(stats.columns[-1], axis=1, inplace=True)
+        stats.to_csv(stats_csv)
+    return zap
+
+def purge(keep=5):
+    dirs = sorted([d for d in os.listdir(extract_dir) \
+                   if os.path.isdir(os.path.join(extract_dir, d)) \
+                   and not os.path.islink(os.path.join(extract_dir, d))])
+    while len(dirs) > keep:
+        zap = dirs.pop(0)
+        print("purge", zap)
+        _zapdir(os.path.join(extract_dir, zap))
+
+def main():
+
+    if os.path.exists(stats_csv):
+        stats = pd.read_csv(stats_csv, index_col=0)
+    else:
+        stats = pd.DataFrame(data=[0]*len(extract.regexes),
+                             index=sorted(extract.regexes))
+    for new_regex in sorted(set(extract.regexes).difference(stats.index)):
+        stats.loc[new_regex] = 0
+
+    if args.dump or args.full_dump:
+        if args.full_dump:
+            print(stats)
+        elif args.dump:
+            if len(stats.columns) == 1:
+                print(stats)
+            else:
+                print(stats[stats.columns[-2:]])
+        sys.exit()
+    elif args.revert:
+        zap = revert()
+        if zap:
+            print("rolled back from", zap)
+        else:
+            print("not enough history to revert")
+        sys.exit()
+
+    tmp_save_file = {}
+    save_file = {}
+    save_fh = {}
+    for typ in extract.regexes:
+        save_file[typ] = "%s/%s.txt" % (save_dir, typ)
+        tmp_save_file[typ] = "%s/%s.txt" % (tmp_save_dir, typ)
+    if not os.path.exists(tmp_save_dir):
+        os.makedirs(tmp_save_dir)
+
+    iids = set()
+    total = {}
+    for typ in extract.regexes:
+        total[typ] = 0
+    bar = Bar("Processing", max=db.bulk_text_count(),
+              suffix="%(index)d/%(max)d %(percent)d%% %(elapsed_td)s")
+
+    def handle_result(iid, result):
+        iids.add(iid)
+        for typ, hit in result:
+            if typ not in save_fh:
+                save_fh[typ] = open(tmp_save_file[typ], 'w', encoding="utf-8")
+            total[typ] += 1
+            # zap embedded newlines
+            hit = re.sub(r"\s*\n+\s*", " ", hit)
+            print("%s %s" % (iid, hit), file=save_fh[typ])
+
+    if args.linear:
+        # single processor (useful for debugging)
+        for entry in db.fetch_bulk_text():
+            bar.next()
+            iid, result = apply_extract(entry)
+            handle_result(iid, result)
+    else:
+        # parallel processing
+        p = Pool()
+        for iid, result in p.imap_unordered(apply_extract,
+                                            db.fetch_bulk_text(),
+                                            chunksize=100):
+            bar.next()
+            handle_result(iid, result)
+
+    bar.finish()
+
+    last_total = dict(stats[stats.columns[-1]])
+
+    if total != last_total or args.save:
+        os.makedirs(save_dir)
+        if os.path.lexists(save_cur_link):
+            last_run_time = os.readlink(save_cur_link)
+            os.unlink(save_cur_link)
+            if os.path.lexists(save_last_link):
+                os.unlink(save_last_link)
+            os.symlink(last_run_time, save_last_link)
+        os.symlink(run_time, save_cur_link)
+        for typ in sorted(save_fh):
+            save_fh[typ].close()
+            fh = open(tmp_save_file[typ], encoding="utf-8")
+            hits = set()
+            for line in (x.strip() for x in fh):
+                iid, hit = line.split(' ', 1)
+                hits.add((iid, hit))
+            fh = open(save_file[typ], 'w', encoding="utf-8")
+            for iid, hit in sorted(hits):
+                print(iid + ':', hit, file=fh)
+            fh.close()
+            print("created", os.path.relpath(save_file[typ], smoke.base_dir))
+        for f in glob("%s/*.txt" % tmp_save_dir):
+            os.unlink(f)
+        if total != last_total:
+            purge()
+
+    print(len(iids), "iids")
+
+    if total != last_total:
+        next_col = str(int(stats.columns[-1])+1)
+        stats[next_col] = [total[x] for x in stats.index]
+        stats.to_csv(stats_csv)
+        indices = []
+        for idx in stats.index:
+            if total[idx] != last_total[idx]:
+                indices.append(idx)
+        print(stats[stats.columns[-2:]].loc[indices])
+
+if __name__ == "__main__":
+    main()

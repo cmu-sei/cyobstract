@@ -1,0 +1,61 @@
+#!/bin/env python
+#
+# Information Discovery
+# 
+# Copyright 2018 Carnegie Mellon University. All Rights Reserved.
+# 
+# NO WARRANTY. THIS CARNEGIE MELLON UNIVERSITY AND SOFTWARE ENGINEERING
+# INSTITUTE MATERIAL IS FURNISHED ON AN "AS-IS" BASIS. CARNEGIE MELLON
+# UNIVERSITY MAKES NO WARRANTIES OF ANY KIND, EITHER EXPRESSED OR
+# IMPLIED, AS TO ANY MATTER INCLUDING, BUT NOT LIMITED TO, WARRANTY OF
+# FITNESS FOR PURPOSE OR MERCHANTABILITY, EXCLUSIVITY, OR RESULTS
+# OBTAINED FROM USE OF THE MATERIAL. CARNEGIE MELLON UNIVERSITY DOES NOT
+# MAKE ANY WARRANTY OF ANY KIND WITH RESPECT TO FREEDOM FROM PATENT,
+# TRADEMARK, OR COPYRIGHT INFRINGEMENT.
+#
+# Released under a BSD-style license, please see LICENSE.txt or contact
+# permission@sei.cmu.edu for full terms.
+#
+# [DISTRIBUTION STATEMENT A] This material has been approved for public
+# release and unlimited distribution. Please see Copyright notice for
+# non-US Government use and distribution.
+#
+# CERT is registered in the U.S. Patent and Trademark Office by
+# Carnegie Mellon University.
+#
+# DM18-0345
+
+# PURPOSE
+# Build the HTML entity regex as well as a lookup table.
+# Both should be placed in extract/re_auto.py
+
+from __future__ import print_function
+
+import os, sys, re
+from io import open
+
+import smoke
+from cyobstract import trie
+
+config = smoke.config()
+
+entity_file = os.path.join(config.etc_dir, "html_entities.txt")
+code_map = {}
+codes = set()
+lc = 0
+for line in (x.strip() for x in open(entity_file, encoding="utf-8")):
+    lc += 1
+    fields = line.split('|')
+    code = fields[0].lower()
+    if len(fields) == 3:
+        char = u'|'
+    else:
+        char = fields[1]
+    if not char:
+        char = u" "
+    code_map[code] = char
+    code = re.sub(r"#", "\\#", code);
+    codes.add(code)
+
+print(trie.re_str_from_tokens(codes))
+print(repr(code_map))

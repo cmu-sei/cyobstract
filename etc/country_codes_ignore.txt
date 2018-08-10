@@ -1,0 +1,54 @@
+# these are in addition to common words 2 or 3 letters long
+# in etc/common_words.txt
+
+AM
+CC  # coordination center
+BB  # blackberry
+#BR  # incident ticket (but actually does mean Brazil)
+CD
+DM  # miltary base
+ET  # eastern time
+FI  # field investigator
+ID  # identification
+IR  # incident response
+IS
+FO  # focused operations
+HR  # human resources
+NA  # not applicable
+PH  # phone
+PM
+SA  # situational alert
+SI  # sensitive information
+SB  # SB Alliance
+SE  # south east
+SR  # tcp flags
+TR  # malware family
+RE  # reply
+VA  # veteran's affairs
+RO  # regional office
+SV  # SV.SO.SDINC
+IM  # incident management
+ER  # emergency room
+IE  # internet explorer
+#PT  # pacific time, but enough true portugal to keep
+SN  # serial number
+CR  # carriage return
+CI  # CI employee
+UA  # lots of UA-Java, UA-CPU, user agent...
+AD  # active directory
+PS  # PS/SP, physical security
+LT  # lieutenant
+GB  # gigabytes
+AG  # DE company
+ES  # HP ES
+MX  # all sorts of noise
+RW  # noise
+FR  # federal reserve
+SS  # social security
+TM  # noise
+EE  # noise
+ST  # saint
+CM  # noise
+AF  # noise
+SG  # hotline
+WS  # noise

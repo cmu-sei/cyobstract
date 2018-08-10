@@ -1,0 +1,82 @@
+#!/bin/env python
+#
+# Information Discovery
+# 
+# Copyright 2018 Carnegie Mellon University. All Rights Reserved.
+# 
+# NO WARRANTY. THIS CARNEGIE MELLON UNIVERSITY AND SOFTWARE ENGINEERING
+# INSTITUTE MATERIAL IS FURNISHED ON AN "AS-IS" BASIS. CARNEGIE MELLON
+# UNIVERSITY MAKES NO WARRANTIES OF ANY KIND, EITHER EXPRESSED OR
+# IMPLIED, AS TO ANY MATTER INCLUDING, BUT NOT LIMITED TO, WARRANTY OF
+# FITNESS FOR PURPOSE OR MERCHANTABILITY, EXCLUSIVITY, OR RESULTS
+# OBTAINED FROM USE OF THE MATERIAL. CARNEGIE MELLON UNIVERSITY DOES NOT
+# MAKE ANY WARRANTY OF ANY KIND WITH RESPECT TO FREEDOM FROM PATENT,
+# TRADEMARK, OR COPYRIGHT INFRINGEMENT.
+#
+# Released under a BSD-style license, please see LICENSE.txt or contact
+# permission@sei.cmu.edu for full terms.
+#
+# [DISTRIBUTION STATEMENT A] This material has been approved for public
+# release and unlimited distribution. Please see Copyright notice for
+# non-US Government use and distribution.
+#
+# CERT is registered in the U.S. Patent and Trademark Office by
+# Carnegie Mellon University.
+#
+# DM18-0345
+
+from __future__ import print_function
+from past.builtins import basestring
+
+import os, sys
+
+import smoke
+from cyobstract import extract
+
+def help():
+    print("""
+usage: %s incident_id [...]
+
+Create a draft copy of extracted artifacts from one or more
+incident IDs. This is intended as a time saver for when the
+incident is manually inspected and parsed. The results are
+then used by bin/smoke_test for generating true positives,
+false positives, and false negatives during regex development
+to measure improvements or regressions.
+
+optional arguments:
+  -h, --help    show this help message and exit
+    """.strip() % sys.argv[0], file=sys.stderr)
+    return(1)
+
+def main():
+    if len(sys.argv) < 2:
+        help() and sys.exit(1)
+    if "-h" in sys.argv or "--help" in sys.argv:
+        help() and sys.exit()
+    for iid in sys.argv[1:]:
+        ndir = os.path.join(smoke.iid_dir, iid)
+        notes_file = os.path.join(ndir, "notes.txt")
+        if not os.path.exists(notes_file):
+            print(iid, "notes.txt missing")
+            continue
+        drafts_file = os.path.join(ndir, "knowns_draft.txt")
+        fh = open(drafts_file, 'w')
+        for i, line in enumerate(x.strip() for x in open(notes_file)):
+            for typ in sorted(extract.regexes):
+                regex = extract.regexes[typ]
+                if callable(regex):
+                    hits = regex(line)
+                else:
+                    hits = regex.findall(line)
+                for hit in hits:
+                    if not isinstance(hit, basestring):
+                        hit = hit[0]
+                    print("%d: %s %s" % (i+1, typ, hit), file=fh)
+        fh.close()
+        print("created", os.path.relpath(drafts_file, smoke.base_dir),
+              file=sys.stderr)
+
+
+if __name__ == "__main__":
+    main()

@@ -1,0 +1,108 @@
+#!/bin/env python
+#
+# Information Discovery
+# 
+# Copyright 2018 Carnegie Mellon University. All Rights Reserved.
+# 
+# NO WARRANTY. THIS CARNEGIE MELLON UNIVERSITY AND SOFTWARE ENGINEERING
+# INSTITUTE MATERIAL IS FURNISHED ON AN "AS-IS" BASIS. CARNEGIE MELLON
+# UNIVERSITY MAKES NO WARRANTIES OF ANY KIND, EITHER EXPRESSED OR
+# IMPLIED, AS TO ANY MATTER INCLUDING, BUT NOT LIMITED TO, WARRANTY OF
+# FITNESS FOR PURPOSE OR MERCHANTABILITY, EXCLUSIVITY, OR RESULTS
+# OBTAINED FROM USE OF THE MATERIAL. CARNEGIE MELLON UNIVERSITY DOES NOT
+# MAKE ANY WARRANTY OF ANY KIND WITH RESPECT TO FREEDOM FROM PATENT,
+# TRADEMARK, OR COPYRIGHT INFRINGEMENT.
+#
+# Released under a BSD-style license, please see LICENSE.txt or contact
+# permission@sei.cmu.edu for full terms.
+#
+# [DISTRIBUTION STATEMENT A] This material has been approved for public
+# release and unlimited distribution. Please see Copyright notice for
+# non-US Government use and distribution.
+#
+# CERT is registered in the U.S. Patent and Trademark Office by
+# Carnegie Mellon University.
+#
+# DM18-0345
+
+from __future__ import print_function
+from builtins import next
+
+import sys, re, random
+from progress.bar import Bar
+
+from smoke import db
+
+def help():
+    print("""
+usage: %s [-i] [-r] [-q] pattern [incident_id [...]]
+
+Search the given incident reports using the given arbitrary
+regular expression. If no incident IDs are provided, all
+incident reports are searched.
+
+optional arguments:
+  -h, --help    show this help message and exit
+  -i            make the regular expression case insensitive
+  -q            quiet (no progress bar)
+  -r            search the incident reports in random order
+    """.strip() % sys.argv[0], file=sys.stderr)
+    return(1)
+
+def main():
+    if len(sys.argv) < 2:
+        help() and sys.exit(1)
+    args = []
+    ignore_case = randomize = quiet = False
+    for arg in sys.argv[1:]:
+        if arg == "-i":
+            ignore_case = True
+        elif arg == "-r":
+            randomize = True
+        elif arg == "-q":
+            quiet = True
+        elif arg == "-h":
+            help() and sys.exit()
+        else:
+            args.append(arg)
+    pat, args = (args[0], args[1:])
+    if ignore_case:
+        pat = re.compile(pat, re.I)
+    else:
+        pat = re.compile(pat)
+    if args:
+        iids = []
+        for iid in args:
+            iid = re.sub(r":.*$", "", iid)
+            iids.append(iid)
+    else:
+        iids = list(db.fetch_iids())
+    if randomize:
+        random.shuffle(iids)
+    bar = None
+    if not quiet and len(iids) > 1000:
+        bar =  Bar("Processing", max=len(iids),
+                   suffix="%(index)d/%(max)d %(percent)d%% %(elapsed_td)s")
+    for iid in iids:
+        entry = db.fetch_incident_report(iid)
+        cr = False
+        if bar:
+            bar.next()
+        if not entry:
+            if args:
+                print("no entry found for %s" % iid, file=sys.stderr)
+            continue
+        lc = 1
+        for line in (entry.split("\n")):
+            if pat.search(line):
+                if not cr and bar:
+                    print(file=sys.stderr)
+                    cr = True
+                print(iid + ":%s" % lc, line)
+            lc += 1
+    if bar:
+        bar.finish()
+
+
+if __name__ == "__main__":
+    main()

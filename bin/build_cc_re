@@ -1,0 +1,89 @@
+#!/bin/env python
+#
+# Information Discovery
+# 
+# Copyright 2018 Carnegie Mellon University. All Rights Reserved.
+# 
+# NO WARRANTY. THIS CARNEGIE MELLON UNIVERSITY AND SOFTWARE ENGINEERING
+# INSTITUTE MATERIAL IS FURNISHED ON AN "AS-IS" BASIS. CARNEGIE MELLON
+# UNIVERSITY MAKES NO WARRANTIES OF ANY KIND, EITHER EXPRESSED OR
+# IMPLIED, AS TO ANY MATTER INCLUDING, BUT NOT LIMITED TO, WARRANTY OF
+# FITNESS FOR PURPOSE OR MERCHANTABILITY, EXCLUSIVITY, OR RESULTS
+# OBTAINED FROM USE OF THE MATERIAL. CARNEGIE MELLON UNIVERSITY DOES NOT
+# MAKE ANY WARRANTY OF ANY KIND WITH RESPECT TO FREEDOM FROM PATENT,
+# TRADEMARK, OR COPYRIGHT INFRINGEMENT.
+#
+# Released under a BSD-style license, please see LICENSE.txt or contact
+# permission@sei.cmu.edu for full terms.
+#
+# [DISTRIBUTION STATEMENT A] This material has been approved for public
+# release and unlimited distribution. Please see Copyright notice for
+# non-US Government use and distribution.
+#
+# CERT is registered in the U.S. Patent and Trademark Office by
+# Carnegie Mellon University.
+#
+# DM18-0345
+
+# PURPOSE:
+# Build the country/adjectival regex.
+# It should be placed in extract/re_auto.py
+
+from __future__ import print_function
+
+import os
+
+import smoke
+from cyobstract import trie
+
+config = smoke.config()
+
+cc_ign = set()
+
+cc_ign_file = os.path.join(config.etc_dir, "country_codes_ignore.txt")
+if os.path.exists(cc_ign_file):
+    cc_ign.update(smoke.load_and_strip_comments(cc_ign_file))
+
+common_word_file = os.path.join(config.etc_dir, "common_words.txt")
+if os.path.exists(common_word_file):
+    for line in smoke.load_and_strip_comments(common_word_file):
+        rank, word = line.split()
+        if (len(word) == 2 or len(word) == 3) and word != 'us':
+            cc_ign.add(word.upper())
+
+state_code_file = os.path.join(config.etc_dir, "state_codes.txt")
+if os.path.exists(state_code_file):
+    for line in smoke.load_and_strip_comments(state_code_file):
+        abbr, state = line.split(" ", 1)
+        cc_ign.add(abbr)
+        cc_ign.add(state)
+
+ccd = {}
+
+cc_file = os.path.join(config.etc_dir, "country_codes.txt")
+for line in smoke.load_and_strip_comments(cc_file):
+    cc2, cc3, name = line.split(' ', 2)
+    # no longer use cc3, rarely used and too many collisions
+    # no longer use cc2, too many false positives and full
+    # name typically accompanies it.
+    #ccs.add(cc2)
+    ccd[name] = name
+    ccd[name.upper()] = name
+    ccd[name.lower()] = name
+
+cc_adj_file = os.path.join(config.etc_dir, "country_adjectivals.txt")
+for line in smoke.load_and_strip_comments(cc_adj_file):
+    canon, name, adj = line.split(',')
+    ccd[name] = name
+    ccd[name.upper()] = name
+    ccd[name.lower()] = name
+    ccd[adj] = name
+    ccd[adj.upper()] = name
+    ccd[adj.lower()] = name
+
+ccs = set(ccd.keys())
+ccs.difference_update(cc_ign)
+
+print(trie.re_str_from_tokens(ccs))
+
+print(repr(tuple(ccd.items())))

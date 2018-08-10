@@ -1,0 +1,24 @@
+For smoke_test to work, clone the textract repo into ../textract
+
+###
+
+For building TLD regex, download this into the etc directory:
+
+https://data.iana.org/TLD/tlds-alpha-by-domain.txt
+
+###
+
+web browser not doing literal rendering of HTML content
+
+Potential new indicators:
+
+cidr
+range
+portproto
+isp
+country/region
+twitter
+
+asn
+cve
+sha256

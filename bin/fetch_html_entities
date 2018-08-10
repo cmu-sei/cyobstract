@@ -1,0 +1,63 @@
+#!/usr/bin/perl
+#
+# Information Discovery
+# 
+# Copyright 2018 Carnegie Mellon University. All Rights Reserved.
+# 
+# NO WARRANTY. THIS CARNEGIE MELLON UNIVERSITY AND SOFTWARE ENGINEERING
+# INSTITUTE MATERIAL IS FURNISHED ON AN "AS-IS" BASIS. CARNEGIE MELLON
+# UNIVERSITY MAKES NO WARRANTIES OF ANY KIND, EITHER EXPRESSED OR
+# IMPLIED, AS TO ANY MATTER INCLUDING, BUT NOT LIMITED TO, WARRANTY OF
+# FITNESS FOR PURPOSE OR MERCHANTABILITY, EXCLUSIVITY, OR RESULTS
+# OBTAINED FROM USE OF THE MATERIAL. CARNEGIE MELLON UNIVERSITY DOES NOT
+# MAKE ANY WARRANTY OF ANY KIND WITH RESPECT TO FREEDOM FROM PATENT,
+# TRADEMARK, OR COPYRIGHT INFRINGEMENT.
+#
+# Released under a BSD-style license, please see LICENSE.txt or contact
+# permission@sei.cmu.edu for full terms.
+#
+# [DISTRIBUTION STATEMENT A] This material has been approved for public
+# release and unlimited distribution. Please see Copyright notice for
+# non-US Government use and distribution.
+#
+# CERT is registered in the U.S. Patent and Trademark Office by
+# Carnegie Mellon University.
+#
+# DM18-0345
+
+use strict;
+use warnings;
+use utf8;
+
+use FindBin;
+
+use HTML::TableExtract;
+
+my $etc_dir = "$FindBin::Bin/../cyobstract/etc";
+my $file = "$etc_dir/html_entities.txt";
+
+my $url = "http://www.theukwebdesigncompany.com/articles/entity-escape-characters.php";
+my $html = `wget -q -O - $url`;
+die "couldn't fetch $url" unless $html;
+print "fetched $url\n";
+
+my $te = HTML::TableExtract->new(headers => ["Symbol", "Code", "Entity"]);
+$te->parse($html);
+
+open(FH, '>:encoding(UTF-8)', $file) or die "couldn't create $file: $!";
+for my $row ($te->first_table_found->rows) {
+  my($symbol, $code, $entity) = @$row;
+  if ($symbol =~ /space/i) {
+    $symbol = ' ';
+  }
+  $code = '' if $code !~ /&/;
+  if ($code) {
+    print FH join('|', $code, $symbol), "\n";
+  }
+  $entity = '' if $entity !~ /&/;
+  if ($entity) {
+    print FH join('|', $entity, $symbol), "\n";
+  }
+}
+close(FH);
+print "created $file\n";

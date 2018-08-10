@@ -1,0 +1,122 @@
+#!/usr/bin/perl
+#
+# Information Discovery
+# 
+# Copyright 2018 Carnegie Mellon University. All Rights Reserved.
+# 
+# NO WARRANTY. THIS CARNEGIE MELLON UNIVERSITY AND SOFTWARE ENGINEERING
+# INSTITUTE MATERIAL IS FURNISHED ON AN "AS-IS" BASIS. CARNEGIE MELLON
+# UNIVERSITY MAKES NO WARRANTIES OF ANY KIND, EITHER EXPRESSED OR
+# IMPLIED, AS TO ANY MATTER INCLUDING, BUT NOT LIMITED TO, WARRANTY OF
+# FITNESS FOR PURPOSE OR MERCHANTABILITY, EXCLUSIVITY, OR RESULTS
+# OBTAINED FROM USE OF THE MATERIAL. CARNEGIE MELLON UNIVERSITY DOES NOT
+# MAKE ANY WARRANTY OF ANY KIND WITH RESPECT TO FREEDOM FROM PATENT,
+# TRADEMARK, OR COPYRIGHT INFRINGEMENT.
+#
+# Released under a BSD-style license, please see LICENSE.txt or contact
+# permission@sei.cmu.edu for full terms.
+#
+# [DISTRIBUTION STATEMENT A] This material has been approved for public
+# release and unlimited distribution. Please see Copyright notice for
+# non-US Government use and distribution.
+#
+# CERT is registered in the U.S. Patent and Trademark Office by
+# Carnegie Mellon University.
+#
+# DM18-0345
+
+use strict;
+use warnings;
+use utf8;
+
+use FindBin;
+
+use HTML::TableExtract;
+
+my $etc_dir = "$FindBin::Bin/../cyobstract/etc";
+my $file = "$etc_dir/country_codes.txt";
+
+my $url = "https://countrycode.org/";
+my $html = `wget -q -O - $url`;
+die "couldn't fetch $url" unless $html;
+print "fetched $url\n";
+
+my %countries;
+
+my $te = HTML::TableExtract->new(headers => ["COUNTRY", "ISO CODES"]);
+$te->parse($html);
+
+open(FH, '>', $file) or die "couldn't create $file: $!";
+for my $row ($te->first_table_found->rows) {
+  my $country = $row->[0];
+  my($cc2, $cc3) = split(/\s*\/\s*/, $row->[1]);
+  print FH "$cc2 $cc3 $country\n";
+  $countries{lc($country)} = $country;
+}
+close(FH);
+print "created $file\n";
+
+###
+
+$countries{lc("Burma")} = "Myanmar";
+$countries{lc("Cabo Verde")} = "Cape Verde";
+$countries{lc("People's Republic of China")} = "China";
+$countries{lc("England")} = "United Kingdom";
+$countries{lc("Great Britain")} = "United Kingdom";
+$countries{lc("Republic of Macedonia")} = "Macedonia";
+$countries{lc("Federated States of Micronesia")} = "Micronesia";
+$countries{lc("Norfolk Island")} = "Australia";
+$countries{lc("Northern Ireland")} = "United Kingdom";
+$countries{lc("Scotland")} = "United Kingdom";
+$countries{lc("United States Virgin Islands")} = "U.S. Virgin Islands";
+$countries{lc("Wales")} = "United Kingdom";
+
+$file = "etc/country_adjectivals.txt";
+
+$url = "https://en.wikipedia.org/wiki/List_of_adjectival_and_demonymic_forms_for_countries_and_nations";
+$html = `wget -q -O - $url`;
+die "couldn't fetch $url" unless $html;
+print "fetched $url\n";
+
+$te = HTML::TableExtract->new(headers => ["Country", "Adjectivals"]);
+$te->parse($html);
+open(FH, '>', "$FindBin::Bin/../$file")
+    or die "couldn't create $file: $!";
+for my $row ($te->first_table_found->rows) {
+  next unless $row->[0] && $row->[1];
+  my($country, $adjs) = @$row;
+  $country =~ s/,\sThe//i;
+  $country =~ s/\[\d+\]//g;
+  $country =~ s/\s*\([^)]+\)\s*/ /;
+  $country =~ s/\s+$//;
+  $country =~ s/^\s+//;
+  $country =~ s/^([^,]+),\s*(.*)$/$2 $1/;
+  $country =~ s/\xc3\xa3/a/g; # ã
+  $country =~ s/\xc3\xa9/e/g; # é
+  $country =~ s/\xc3\xad/i/g; # í
+  $country =~ s/\xc3\x85/A/g; # Å
+  $country =~ s/\xc3\xb4/o/g; # ô
+  $country =~ s/\xc3\xa7/c/g; # ç
+  $adjs =~  s/\[\d+\]//g;
+  $adjs =~ s/\xc3\xa3/a/g; # ã
+  $adjs =~ s/\xc3\xa9/e/g; # é
+  $adjs =~ s/\xc3\xad/i/g; # í
+  $adjs =~ s/\xc3\x85/A/g; # Å
+  $adjs =~ s/\xc3\xb4/o/g; # ô
+  $adjs =~ s/\xc3\xa7/c/g; # ç
+  if (! $countries{lc($country)}) {
+    $countries{lc($country)} = $country;
+  }
+  for my $adj (split(/\s*(?:,|or|\/)\s+/, $adjs)) {
+    $adj =~ s/\s+$//;
+    $adj =~ s/^\s+//;
+    print FH $countries{lc($country)}, ',', $country, ',', $adj, "\n"
+      unless length($adj) < 3;
+  }
+}
+print FH "United States,United States,U.S.A\n";
+print FH "United States,United States,USA\n";
+print FH "North Korea,Democratic People's Republic of Korea,North Korean\n";
+print FH "North Korea,DPRK,North Korean\n";
+close(FH);
+print "created $file\n";

@@ -1,0 +1,86 @@
+#!/bin/env python
+#
+# Information Discovery
+# 
+# Copyright 2018 Carnegie Mellon University. All Rights Reserved.
+# 
+# NO WARRANTY. THIS CARNEGIE MELLON UNIVERSITY AND SOFTWARE ENGINEERING
+# INSTITUTE MATERIAL IS FURNISHED ON AN "AS-IS" BASIS. CARNEGIE MELLON
+# UNIVERSITY MAKES NO WARRANTIES OF ANY KIND, EITHER EXPRESSED OR
+# IMPLIED, AS TO ANY MATTER INCLUDING, BUT NOT LIMITED TO, WARRANTY OF
+# FITNESS FOR PURPOSE OR MERCHANTABILITY, EXCLUSIVITY, OR RESULTS
+# OBTAINED FROM USE OF THE MATERIAL. CARNEGIE MELLON UNIVERSITY DOES NOT
+# MAKE ANY WARRANTY OF ANY KIND WITH RESPECT TO FREEDOM FROM PATENT,
+# TRADEMARK, OR COPYRIGHT INFRINGEMENT.
+#
+# Released under a BSD-style license, please see LICENSE.txt or contact
+# permission@sei.cmu.edu for full terms.
+#
+# [DISTRIBUTION STATEMENT A] This material has been approved for public
+# release and unlimited distribution. Please see Copyright notice for
+# non-US Government use and distribution.
+#
+# CERT is registered in the U.S. Patent and Trademark Office by
+# Carnegie Mellon University.
+#
+# DM18-0345
+
+from __future__ import print_function
+
+import sys, re, random
+
+from smoke import db
+
+def help():
+    print("""
+usage: %s [-d] [-r] [incident_id [...]]
+
+Print one or more incident reports to stdout. If no incidents
+are specified, all incidents are processed.
+
+optional arguments:
+  -h, --help    show this help message and exit
+  -d            decode HTML entities
+  -r            print entries in randomized order
+    """.strip() % sys.argv[0], file=sys.stderr)
+    return(1)
+
+def main():
+    if len(sys.argv) < 2:
+        help() and sys.exit(1)
+    args = []
+    decode = randomize = False
+    for arg in sys.argv[1:]:
+        if arg == "-d":
+            decode = True
+        elif arg == "-r":
+            randomize = True
+        elif arg == "-h" or arg == "--help":
+            help() and sys.exit(1)
+        else:
+            args.append(arg)
+    if args:
+        iids = []
+        for iid in args:
+            iid = re.sub(r":.*$", "", iid)
+            org = db.fetch_iid_org(iid)
+            iids.append((iid, org))
+    else:
+        iids = list(db.fetch_iids_with_org())
+    if randomize:
+        random.shuffle(iids)
+    for iid, org in iids:
+        iid = re.sub(r":.*$", "", iid)
+        entry = db.fetch_incident_report(iid)
+        if not entry:
+            print("no entry found for %s" % iid, file=sys.stderr)
+            continue
+        if decode:
+            from cyobstract import extract
+            entry = extract.decode_entities(entry)
+        print("-" * 78, "\n", iid, '-', org, "\n", "-" * 78, "\n")
+        print(entry)
+
+
+if __name__ == "__main__":
+    main()

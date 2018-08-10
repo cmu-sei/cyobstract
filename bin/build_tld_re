@@ -1,0 +1,56 @@
+#!/bin/env python
+#
+# Information Discovery
+# 
+# Copyright 2018 Carnegie Mellon University. All Rights Reserved.
+# 
+# NO WARRANTY. THIS CARNEGIE MELLON UNIVERSITY AND SOFTWARE ENGINEERING
+# INSTITUTE MATERIAL IS FURNISHED ON AN "AS-IS" BASIS. CARNEGIE MELLON
+# UNIVERSITY MAKES NO WARRANTIES OF ANY KIND, EITHER EXPRESSED OR
+# IMPLIED, AS TO ANY MATTER INCLUDING, BUT NOT LIMITED TO, WARRANTY OF
+# FITNESS FOR PURPOSE OR MERCHANTABILITY, EXCLUSIVITY, OR RESULTS
+# OBTAINED FROM USE OF THE MATERIAL. CARNEGIE MELLON UNIVERSITY DOES NOT
+# MAKE ANY WARRANTY OF ANY KIND WITH RESPECT TO FREEDOM FROM PATENT,
+# TRADEMARK, OR COPYRIGHT INFRINGEMENT.
+#
+# Released under a BSD-style license, please see LICENSE.txt or contact
+# permission@sei.cmu.edu for full terms.
+#
+# [DISTRIBUTION STATEMENT A] This material has been approved for public
+# release and unlimited distribution. Please see Copyright notice for
+# non-US Government use and distribution.
+#
+# CERT is registered in the U.S. Patent and Trademark Office by
+# Carnegie Mellon University.
+#
+# DM18-0345
+
+# PURPOSE
+# Build the top level domain regex.
+# It should be placed in extract/re_auto.py
+
+from __future__ import print_function
+
+import os
+
+import smoke
+from cyobstract import trie
+
+config = smoke.config()
+
+tld_ign_file = os.path.join(config.etc_dir, "tlds_ignore.txt")
+tlds_ign = set()
+if os.path.exists(tld_ign_file):
+    for tld in smoke.load_and_strip_comments(tld_ign_file):
+        tlds_ign.add(tld.lower())
+        tlds_ign.add(tld.upper())
+
+tld_file = os.path.join(config.etc_dir, "tlds.txt")
+tlds = set()
+for tld in smoke.load_and_strip_comments(tld_file):
+    tlds.add(tld.lower())
+    tlds.add(tld.upper())
+
+tlds.difference_update(tlds_ign)
+
+print(trie.re_str_from_tokens(tlds))

@@ -1,0 +1,264 @@
+#!/bin/env python
+#
+# Information Discovery
+# 
+# Copyright 2018 Carnegie Mellon University. All Rights Reserved.
+# 
+# NO WARRANTY. THIS CARNEGIE MELLON UNIVERSITY AND SOFTWARE ENGINEERING
+# INSTITUTE MATERIAL IS FURNISHED ON AN "AS-IS" BASIS. CARNEGIE MELLON
+# UNIVERSITY MAKES NO WARRANTIES OF ANY KIND, EITHER EXPRESSED OR
+# IMPLIED, AS TO ANY MATTER INCLUDING, BUT NOT LIMITED TO, WARRANTY OF
+# FITNESS FOR PURPOSE OR MERCHANTABILITY, EXCLUSIVITY, OR RESULTS
+# OBTAINED FROM USE OF THE MATERIAL. CARNEGIE MELLON UNIVERSITY DOES NOT
+# MAKE ANY WARRANTY OF ANY KIND WITH RESPECT TO FREEDOM FROM PATENT,
+# TRADEMARK, OR COPYRIGHT INFRINGEMENT.
+#
+# Released under a BSD-style license, please see LICENSE.txt or contact
+# permission@sei.cmu.edu for full terms.
+#
+# [DISTRIBUTION STATEMENT A] This material has been approved for public
+# release and unlimited distribution. Please see Copyright notice for
+# non-US Government use and distribution.
+#
+# CERT is registered in the U.S. Patent and Trademark Office by
+# Carnegie Mellon University.
+#
+# DM18-0345
+
+# PURPOSE
+# Run all extractions on the collection of incident reports
+# that have been manually parsed and report statistics on
+# true positives, false positives and false negatives. Results
+# are compared to prior runs.
+
+from __future__ import print_function
+from builtins import str
+from past.builtins import basestring
+
+import sys, os, re, shutil
+from glob import glob
+from datetime import datetime
+
+import smoke
+from cyobstract import extract
+
+def purge(keep=5):
+    dates = set()
+    for f in glob("%s/*.txt" % smoke.out_dir):
+        ts, _ = os.path.basename(f).split('.', 1)
+        if not re.search("^\d+T\d+$", ts):
+            continue
+        dates.add(ts)
+    dates = sorted(dates)
+    while len(dates) > keep:
+        zap = dates.pop(0)
+        print("purge", zap)
+        for f in glob("%s/%s.*.txt" % (smoke.out_dir, zap)):
+            os.unlink(f)
+
+def ind_types():
+    return sorted(extract.regexes)
+
+def incident_ids():
+    ids = []
+    for d in sorted(glob("%s/INC*" % smoke.iid_dir)):
+        yield os.path.basename(d)
+
+def load_indicators_by_type(f, iid):
+    types = set(ind_types())
+    inds = set()
+    rf = os.path.relpath(f, smoke.base_dir)
+    try:
+        lc = 0
+        for line in smoke.load_and_strip_comments(f):
+            lc += 1
+            if not line:
+                continue
+            line = re.sub("^\d+:\s*", "", line)
+            try:
+                cat, ind = re.split("\s+", line, 1)
+            except ValueError:
+                print("missing type; line %d: %s" % (lc, rf), file=sys.stderr)
+                sys.exit(1)
+            if cat not in types:
+                print("unknown type: \"%s\"; line %d: %s" % (cat, lc, rf),
+                    file=sys.stderr)
+                sys.exit(1)
+            inds.add((iid, cat, ind))
+    except IOError:
+        pass
+    return inds
+
+def main():
+    run_time = datetime.now().strftime("%Y%m%dT%H%M%S")
+    false_neg_txt = "false_neg.txt"
+    false_pos_txt = "false_pos.txt"
+    true_pos_txt = "true_pos.txt"
+    false_neg_file = "%s/%s" % (smoke.dat_dir, false_neg_txt)
+    false_pos_file = "%s/%s" % (smoke.dat_dir, false_pos_txt)
+    true_pos_file = "%s/%s" % (smoke.dat_dir, true_pos_txt)
+    ign_neg_hit_file = "%s/ignore_neg_hit.txt" % smoke.dat_dir
+    ign_neg_miss_file = "%s/ignore_neg_miss.txt" % smoke.dat_dir
+    ign_pos_hit_file = "%s/ignore_pos_hit.txt" % smoke.dat_dir
+    ign_pos_miss_file = "%s/ignore_pos_miss.txt" % smoke.dat_dir
+    false_neg_archive = "%s/%s.%s" % (smoke.out_dir, run_time, false_neg_txt)
+    false_pos_archive = "%s/%s.%s" % (smoke.out_dir, run_time, false_pos_txt)
+    true_pos_archive = "%s/%s.%s" % (smoke.out_dir, run_time, true_pos_txt)
+    false_neg_link = "%s/%s" % (smoke.out_dir, false_neg_txt)
+    false_pos_link = "%s/%s" % (smoke.out_dir, false_pos_txt)
+    true_pos_link = "%s/%s" % (smoke.out_dir, true_pos_txt)
+    false_neg_tmp = "%s/%s" % (smoke.tmp_dir, false_neg_txt)
+    false_pos_tmp = "%s/%s" % (smoke.tmp_dir, false_pos_txt)
+    true_pos_tmp = "%s/%s" % (smoke.tmp_dir, true_pos_txt)
+    if os.path.exists(false_neg_file):
+        shutil.copy(false_neg_file, false_neg_tmp)
+    if os.path.exists(false_pos_file):
+        shutil.copy(false_pos_file, false_pos_tmp)
+    if os.path.exists(true_pos_file):
+        shutil.copy(true_pos_file, true_pos_tmp)
+    false_neg_fh = open(false_neg_file, 'w')
+    false_pos_fh = open(false_pos_file, 'w')
+    true_pos_fh = open(true_pos_file, 'w')
+    ign_neg_hit_fh = open(ign_neg_hit_file, 'w')
+    ign_neg_miss_fh = open(ign_neg_miss_file, 'w')
+    ign_pos_hit_fh = open(ign_pos_hit_file, 'w')
+    ign_pos_miss_fh = open(ign_pos_miss_file, 'w')
+
+    def write_indicators(fh, inds, hit_lines=None):
+        for iid, itype, hit in sorted(inds):
+            if hit_lines:
+                iid = "%s:%s" % \
+                    (iid, ','.join(str(x) for x in hit_lines[itype][hit]))
+            print(' '.join((iid, itype, hit)), file=fh)
+
+    def accumulate(d, iids):
+        for _, itype, _ in iids:
+            if itype not in d:
+                d[itype] = 0
+            d[itype] += 1
+
+    true_pos_cnt = {}
+    false_neg_cnt = {}
+    false_pos_cnt = {}
+    ign_neg_hit_cnt = ign_neg_miss_cnt = 0
+    ign_pos_hit_cnt = ign_pos_miss_cnt = 0
+    for iid in incident_ids():
+        print(iid)
+        notes_file = "%s/%s/notes.txt" % (smoke.iid_dir, iid)
+        knowns_file = "%s/%s/knowns.txt" % (smoke.iid_dir, iid)
+        ign_neg_file = "%s/%s/ignore_neg.txt" % (smoke.iid_dir, iid)
+        ign_pos_file = "%s/%s/ignore_pos.txt" % (smoke.iid_dir, iid)
+        knowns =  load_indicators_by_type(knowns_file, iid)
+        ign_neg = load_indicators_by_type(ign_neg_file, iid)
+        ign_pos = load_indicators_by_type(ign_pos_file, iid)
+
+        hits = set()
+        hit_lines = {}
+        lines = open(notes_file).read().split("\n")
+        for ind_type, regex in extract.regexes.items():
+            for i, line in enumerate(lines):
+                if callable(regex):
+                    matches = regex(line)
+                else:
+                    matches = regex.findall(line)
+                for hit in matches:
+                    if not isinstance(hit, basestring):
+                        hit = hit[0]
+                    hits.add((iid, ind_type, hit))
+                    if ind_type not in hit_lines:
+                        hit_lines[ind_type] = {}
+                    hit_lines[ind_type].setdefault(hit, []).append(i+1)
+
+        true_pos = knowns.intersection(hits)
+        false_pos = hits.difference(knowns)
+        false_neg = knowns.difference(hits)
+        ign_pos_hit = ign_pos.intersection(false_pos)
+        ign_pos_miss = ign_pos.difference(false_pos)
+        false_pos.difference_update(ign_pos)
+        ign_neg_hit = ign_neg.intersection(false_neg)
+        ign_neg_miss = ign_neg.difference(false_neg)
+        false_neg.difference_update(ign_neg)
+
+        write_indicators(true_pos_fh, true_pos, hit_lines=hit_lines)
+        write_indicators(false_neg_fh, false_neg)
+        write_indicators(false_pos_fh, false_pos, hit_lines=hit_lines)
+        write_indicators(ign_neg_hit_fh, ign_neg_hit, hit_lines=hit_lines)
+        write_indicators(ign_neg_miss_fh, ign_neg_miss)
+        write_indicators(ign_pos_hit_fh, ign_pos_hit, hit_lines=hit_lines)
+        write_indicators(ign_pos_miss_fh, ign_pos_miss)
+
+        accumulate(true_pos_cnt, true_pos)
+        accumulate(false_neg_cnt, false_neg)
+        accumulate(false_pos_cnt, false_pos)
+        ign_neg_hit_cnt += len(ign_neg_hit)
+        ign_neg_miss_cnt += len(ign_neg_miss)
+        ign_pos_hit_cnt += len(ign_pos_hit)
+        ign_pos_miss_cnt += len(ign_pos_miss)
+
+    diffs = []
+    for itype in sorted(ind_types()):
+        log_file = os.path.join(smoke.log_dir, "%s.log" % itype)
+        last_line = last_vals = None
+        if os.path.exists(log_file):
+            lines = open(log_file).readlines()
+            if lines:
+                last_line = lines[-1].strip()
+                m = re.search(
+                    "true_pos: (\d+) false_neg: (\d+) false_pos: (\d+)",
+                    last_line)
+                if m:
+                    last_vals = [int(m.group(1)),
+                                 int(m.group(2)),
+                                 int(m.group(3))]
+        latest_vals = [true_pos_cnt.get(itype, 0),
+                       false_neg_cnt.get(itype, 0),
+                       false_pos_cnt.get(itype, 0)]
+        latest_line = "%s : true_pos: %d false_neg: %d false_pos: %d" \
+            %  (run_time, true_pos_cnt.get(itype, 0), \
+                          false_neg_cnt.get(itype, 0), \
+                          false_pos_cnt.get(itype, 0))
+        if last_vals != latest_vals:
+            if last_vals:
+                diffs.append((itype, last_line, latest_line))
+            with open(log_file, "a") as fh:
+                print(latest_line, file=fh)
+    print()
+    print("%15s: %3d" % ("true positives", sum(true_pos_cnt.values())))
+    print("%15s: %3d" % ("false negatives", sum(false_neg_cnt.values())))
+    print("%15s: %3d" % ("false positives", sum(false_pos_cnt.values())))
+    print("%15s: %3d" % ("ignore neg hit", ign_neg_hit_cnt))
+    print("%15s: %3d" % ("ignore neg miss", ign_neg_miss_cnt))
+    print("%15s: %3d" % ("ignore pos hit", ign_pos_hit_cnt))
+    print("%15s: %3d" % ("ignore pos miss", ign_pos_miss_cnt))
+    if diffs:
+        print()
+        for itype, last_line, latest_line in diffs:
+            print("%s %s" % (itype, last_line))
+            print("%s %s" % (itype, latest_line))
+
+        if os.path.exists(false_neg_tmp):
+            shutil.copy(false_neg_tmp, false_neg_archive)
+        if os.path.exists(false_neg_link):
+            os.unlink(false_neg_link)
+        os.symlink(os.path.relpath(false_neg_archive, smoke.out_dir),
+                   false_neg_link)
+
+        if os.path.exists(false_pos_tmp):
+            shutil.copy(false_pos_tmp, false_pos_archive)
+        if os.path.exists(false_pos_link):
+            os.unlink(false_pos_link)
+        os.symlink(os.path.relpath(false_pos_archive, smoke.out_dir),
+                   false_pos_link)
+
+        if os.path.exists(true_pos_tmp):
+            shutil.copy(true_pos_tmp, true_pos_archive)
+        if os.path.exists(true_pos_link):
+            os.unlink(true_pos_link)
+        os.symlink(os.path.relpath(true_pos_archive, smoke.out_dir),
+                   true_pos_link)
+
+    purge()
+
+
+if __name__ == "__main__":
+    main()

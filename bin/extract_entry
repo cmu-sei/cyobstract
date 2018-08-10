@@ -1,0 +1,130 @@
+#!/bin/env python
+#
+# Information Discovery
+# 
+# Copyright 2018 Carnegie Mellon University. All Rights Reserved.
+# 
+# NO WARRANTY. THIS CARNEGIE MELLON UNIVERSITY AND SOFTWARE ENGINEERING
+# INSTITUTE MATERIAL IS FURNISHED ON AN "AS-IS" BASIS. CARNEGIE MELLON
+# UNIVERSITY MAKES NO WARRANTIES OF ANY KIND, EITHER EXPRESSED OR
+# IMPLIED, AS TO ANY MATTER INCLUDING, BUT NOT LIMITED TO, WARRANTY OF
+# FITNESS FOR PURPOSE OR MERCHANTABILITY, EXCLUSIVITY, OR RESULTS
+# OBTAINED FROM USE OF THE MATERIAL. CARNEGIE MELLON UNIVERSITY DOES NOT
+# MAKE ANY WARRANTY OF ANY KIND WITH RESPECT TO FREEDOM FROM PATENT,
+# TRADEMARK, OR COPYRIGHT INFRINGEMENT.
+#
+# Released under a BSD-style license, please see LICENSE.txt or contact
+# permission@sei.cmu.edu for full terms.
+#
+# [DISTRIBUTION STATEMENT A] This material has been approved for public
+# release and unlimited distribution. Please see Copyright notice for
+# non-US Government use and distribution.
+#
+# CERT is registered in the U.S. Patent and Trademark Office by
+# Carnegie Mellon University.
+#
+# DM18-0345
+
+from __future__ import print_function
+from builtins import next
+from past.builtins import basestring
+
+import sys, re, random
+from progress.bar import Bar
+
+import smoke
+from smoke import db
+from cyobstract import extract
+
+def help():
+    print("""
+usage: %s [-r] [-v] [-q] [type [...]] [incident_id [...]]
+
+Run the regular expression suite on specific incident reports,
+printing line-by-line results. If no incident IDs are provided,
+all incident reports are searched. Artifact types can also
+be specified, otherwise all types are extracted.
+
+optional arguments:
+    -h, --help    show this help message and exit
+    -r            randomize the order in which reports are searched
+    -v            verbose (print each line prior to results)
+    -q            quiet (no progress bar)
+    -t            print available types and exit
+    """.strip() % sys.argv[0], file=sys.stderr)
+    return(1)
+
+def main():
+    randomize = verbose = quiet = False
+    args = []
+    all_types = set(extract.regexes)
+    types = set()
+    for arg in sys.argv[1:]:
+        if arg == "-r":
+            randomize = True
+        elif arg == "-v":
+            verbose = True
+        elif arg == "-q":
+            quiet = True
+        elif arg == "-t":
+            print("available types:", ", ".join(sorted(all_types)),
+                file=sys.stderr)
+            sys.exit()
+        elif arg == "-h" or arg == "--help":
+            help() and sys.exit()
+        elif arg.startswith("INC"):
+            args.append(arg)
+        elif arg not in all_types:
+            print("invalid type '%s'" % arg, file=sys.stderr)
+            sys.exit(1)
+        else:
+            types.add(arg)
+    if types:
+        types = sorted(types)
+    else:
+        types = sorted(all_types)
+    if args:
+        iids = []
+        for iid in args:
+            iid = re.sub(r":.*$", "", iid)
+            iids.append(iid)
+    else:
+        iids = list(db.fetch_iids())
+    if randomize:
+        random.shuffle(iids)
+    bar = None
+    if not quiet and len(iids) > 1000:
+        bar =  Bar("Processing", max=len(iids),
+                   suffix="%(index)d/%(max)d %(percent)d%% %(elapsed_td)s")
+    for iid in iids:
+        entry = db.fetch_incident_report(iid)
+        if bar:
+            bar.next()
+        if not entry:
+            if args:
+                print("no entry found for %s" % iid, file=sys.stderr)
+            continue
+        lc = 0
+        for line in (entry.split("\n")):
+            lc += 1
+            lp = False
+            for typ in types:
+                regex = extract.regexes[typ]
+                if callable(regex):
+                    matches = regex(line)
+                else:
+                    matches = regex.findall(line)
+                for m in matches:
+                    if not isinstance(m, basestring):
+                        m = m[0]
+                    if not lp:
+                        if verbose:
+                            print(iid + ":%s" % lc, line)
+                        lp = True
+                    print(iid + ":%s:%s:" % (lc, typ), m)
+    if bar:
+        bar.finish()
+
+
+if __name__ == "__main__":
+    main()

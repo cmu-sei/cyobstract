@@ -1,0 +1,320 @@
+Abkhazia,Abkhazia,Abkhaz
+Abkhazia,Abkhazia,Abkhazian
+Afghanistan,Afghanistan,Afghan
+Aland Islands,Aland Islands,Aland Island
+Albania,Albania,Albanian
+Algeria,Algeria,Algerian
+American Samoa,American Samoa,American Samoan
+Andorra,Andorra,Andorran
+Angola,Angola,Angolan
+Anguilla,Anguilla,Anguillan
+Antarctica,Antarctica,Antarctic
+Antigua and Barbuda,Antigua and Barbuda,Antiguan
+Antigua and Barbuda,Antigua and Barbuda,Barbudan
+Argentina,Argentina,Argentine
+Armenia,Armenia,Armenian
+Aruba,Aruba,Aruban
+Australia,Australia,Australian
+Austria,Austria,Austrian
+Azerbaijan,Azerbaijan,Azerbaijani
+Azerbaijan,Azerbaijan,Azeri
+Bahamas,Bahamas,Bahamian
+Bahrain,Bahrain,Bahraini
+Bangladesh,Bangladesh,Bangladeshi
+Barbados,Barbados,Barbadian
+Belarus,Belarus,Belarusian
+Belgium,Belgium,Belgian
+Belize,Belize,Belizean
+Benin,Benin,Beninese
+Benin,Benin,Beninois
+Bermuda,Bermuda,Bermudian
+Bermuda,Bermuda,Bermudan
+Bhutan,Bhutan,Bhutanese
+Bolivia,Bolivia,Bolivian
+Bonaire,Bonaire,Bonaire
+Bosnia and Herzegovina,Bosnia and Herzegovina,Bosnian
+Bosnia and Herzegovina,Bosnia and Herzegovina,Herzegovinian
+Botswana,Botswana,Motswana
+Botswana,Botswana,Botswanan
+Bouvet Island,Bouvet Island,Bouvet Island
+Brazil,Brazil,Brazilian
+British Indian Ocean Territory,British Indian Ocean Territory,BIOT
+Brunei,Brunei,Bruneian
+Bulgaria,Bulgaria,Bulgarian
+Burkina Faso,Burkina Faso,Burkinabe
+Myanmar,Burma,Burmese
+Burundi,Burundi,Burundian
+Cape Verde,Cabo Verde,Cabo Verdean
+Cambodia,Cambodia,Cambodian
+Cameroon,Cameroon,Cameroonian
+Canada,Canada,Canadian
+Cayman Islands,Cayman Islands,Caymanian
+Central African Republic,Central African Republic,Central African
+Chad,Chad,Chadian
+Chile,Chile,Chilean
+China,People's Republic of China,Chinese
+Christmas Island,Christmas Island,Christmas Island
+Cocos Islands,Cocos Islands,Cocos Island
+Colombia,Colombia,Colombian
+Comoros,Comoros,Comoran
+Comoros,Comoros,Comorian
+Democratic Republic of the Congo,Democratic Republic of the Congo,Congolese
+Cook Islands,Cook Islands,Cook Island
+Costa Rica,Costa Rica,Costa Rican
+Cote d'Ivoire,Cote d'Ivoire,Ivorian
+Croatia,Croatia,Croatian
+Cuba,Cuba,Cuban
+Curacao,Curacao,Curacaoan
+Cyprus,Cyprus,Cypriot
+Czech Republic,Czech Republic,Czech
+Denmark,Denmark,Danish
+Djibouti,Djibouti,Djiboutian
+Dominica,Dominica,Dominican
+Dominican Republic,Dominican Republic,Dominican
+East Timor,East Timor,Timorese
+Ecuador,Ecuador,Ecuadoran
+Egypt,Egypt,Egyptian
+El Salvador,El Salvador,Salvadoran
+United Kingdom,England,English
+United Kingdom,England,British
+Equatorial Guinea,Equatorial Guinea,Equatorial Guinean
+Equatorial Guinea,Equatorial Guinea,Equatoguinean
+Eritrea,Eritrea,Eritrean
+Estonia,Estonia,Estonian
+Ethiopia,Ethiopia,Ethiopian
+European Union,European Union,European
+Falkland Islands,Falkland Islands,Falkland Island
+Faroe Islands,Faroe Islands,Faroese
+Fiji,Fiji,Fijian
+Finland,Finland,Finnish
+France,France,French
+French Guiana,French Guiana,French Guianese
+French Polynesia,French Polynesia,French Polynesian
+French Southern Territories,French Southern Territories,French Southern Territories
+Gabon,Gabon,Gabonese
+Gambia,Gambia,Gambian
+Georgia,Georgia,Georgian
+Germany,Germany,German
+Ghana,Ghana,Ghanaian
+Gibraltar,Gibraltar,Gibraltar
+United Kingdom,Great Britain,British
+Greece,Greece,Greek
+Greece,Greece,Hellenic
+Greenland,Greenland,Greenlandic
+Grenada,Grenada,Grenadian
+Guadeloupe,Guadeloupe,Guadeloupe
+Guam,Guam,Guamanian
+Guam,Guam,Guambat
+Guatemala,Guatemala,Guatemalan
+Guernsey,Guernsey,Channel Island
+Guinea,Guinea,Guinean
+Guinea-Bissau,Guinea-Bissau,Bissau-Guinean
+Guyana,Guyana,Guyanese
+Haiti,Haiti,Haitian
+Heard Island and McDonald Islands,Heard Island and McDonald Islands,Heard Island
+Heard Island and McDonald Islands,Heard Island and McDonald Islands,McDonald Islands
+Honduras,Honduras,Honduran
+Hong Kong,Hong Kong,Hong Kong
+Hong Kong,Hong Kong,Hong Kongese
+Hungary,Hungary,Hungarian
+Hungary,Hungary,Magyar
+Iceland,Iceland,Icelandic
+India,India,Indian
+Indonesia,Indonesia,Indonesian
+Iran,Iran,Iranian
+Iran,Iran,Persian
+Iraq,Iraq,Iraqi
+Ireland,Ireland,Irish
+Isle of Man,Isle of Man,Manx
+Israel,Israel,Israeli
+Italy,Italy,Italian
+Ivory Coast,Ivory Coast,Ivorian
+Jamaica,Jamaica,Jamaican
+Jan Mayen,Jan Mayen,Jan Mayen
+Japan,Japan,Japanese
+Jersey,Jersey,Channel Island
+Jordan,Jordan,Jordanian
+Kazakhstan,Kazakhstan,Kazakhstani
+Kazakhstan,Kazakhstan,Kazakh
+Kenya,Kenya,Kenyan
+Kiribati,Kiribati,I-Kiribati
+North Korea,North Korea,North Korean
+South Korea,South Korea,South Korean
+Kosovo,Kosovo,Kosovar
+Kosovo,Kosovo,Kosovan
+Kuwait,Kuwait,Kuwaiti
+Kyrgyzstan,Kyrgyzstan,Kyrgyzstani
+Kyrgyzstan,Kyrgyzstan,Kyrgyz
+Kyrgyzstan,Kyrgyzstan,Kirgiz
+Kyrgyzstan,Kyrgyzstan,Kirghiz
+Laos,Laos,Lao
+Laos,Laos,Laotian
+Latvia,Latvia,Latvian
+Lebanon,Lebanon,Lebanese
+Lesotho,Lesotho,Basotho
+Liberia,Liberia,Liberian
+Libya,Libya,Libyan
+Liechtenstein,Liechtenstein,Liechtenstein
+Lithuania,Lithuania,Lithuanian
+Luxembourg,Luxembourg,Luxembourg
+Luxembourg,Luxembourg,Luxembourgish
+Macau,Macau,Macanese
+Macau,Macau,Chinese
+Macedonia,Republic of Macedonia,Macedonian
+Madagascar,Madagascar,Malagasy
+Malawi,Malawi,Malawian
+Malaysia,Malaysia,Malaysian
+Maldives,Maldives,Maldivian
+Mali,Mali,Malian
+Mali,Mali,Malinese
+Malta,Malta,Maltese
+Marshall Islands,Marshall Islands,Marshallese
+Martinique,Martinique,Martiniquais
+Martinique,Martinique,Martinican
+Mauritania,Mauritania,Mauritanian
+Mauritius,Mauritius,Mauritian
+Mayotte,Mayotte,Mahoran
+Mexico,Mexico,Mexican
+Micronesia,Federated States of Micronesia,Micronesian
+Moldova,Moldova,Moldovan
+Monaco,Monaco,Monegasque
+Monaco,Monaco,Monacan
+Mongolia,Mongolia,Mongolian
+Montenegro,Montenegro,Montenegrin
+Montserrat,Montserrat,Montserratian
+Morocco,Morocco,Moroccan
+Mozambique,Mozambique,Mozambican
+Myanmar,Myanmar,Burmese
+Namibia,Namibia,Namibian
+Nauru,Nauru,Nauruan
+Nepal,Nepal,Nepali
+Nepal,Nepal,Nepalese
+Netherlands,Netherlands,Dutch
+Netherlands,Netherlands,Netherlandic
+New Caledonia,New Caledonia,New Caledonian
+New Zealand,New Zealand,New Zealand
+Nicaragua,Nicaragua,Nicaraguan
+Niger,Niger,Nigerien
+Nigeria,Nigeria,Nigerian
+Niue,Niue,Niuean
+Australia,Norfolk Island,Norfolk Island
+United Kingdom,Northern Ireland,Northern Irish
+United Kingdom,Northern Ireland,British
+Northern Mariana Islands,Northern Mariana Islands,Northern Marianan
+Norway,Norway,Norwegian
+Oman,Oman,Omani
+Pakistan,Pakistan,Pakistani
+Palau,Palau,Palauan
+Palestine,Palestine,Palestinian
+Panama,Panama,Panamanian
+Papua New Guinea,Papua New Guinea,Papua New Guinean
+Papua New Guinea,Papua New Guinea,Papuan
+Paraguay,Paraguay,Paraguayan
+Peru,Peru,Peruvian
+Philippines,Philippines,Filipino
+Philippines,Philippines,Philippine
+Pitcairn Islands,Pitcairn Islands,Pitcairn Island
+Poland,Poland,Polish
+Portugal,Portugal,Portuguese
+Puerto Rico,Puerto Rico,Puerto Rican
+Qatar,Qatar,Qatari
+Reunion,Reunion,Reunionese
+Reunion,Reunion,Reunionnais
+Romania,Romania,Romanian
+Russia,Russia,Russian
+Rwanda,Rwanda,Rwandan
+Saba,Saba,Saba
+Saint Barthelemy,Saint Barthelemy,Barthelemois
+Ascension and Tristan da Cunha Saint Helena,Ascension and Tristan da Cunha Saint Helena,Saint Helenian
+Saint Kitts and Nevis,Saint Kitts and Nevis,Kittitian
+Saint Kitts and Nevis,Saint Kitts and Nevis,Nevisian
+Saint Lucia,Saint Lucia,Saint Lucian
+Saint Martin,Saint Martin,Saint-Martinoise
+Saint Pierre and Miquelon,Saint Pierre and Miquelon,Saint-Pierrais
+Saint Pierre and Miquelon,Saint Pierre and Miquelon,Miquelonnais
+Saint Vincent and the Grenadines,Saint Vincent and the Grenadines,Saint Vincentian
+Saint Vincent and the Grenadines,Saint Vincent and the Grenadines,Vincentian
+Samoa,Samoa,Samoan
+San Marino,San Marino,Sammarinese
+Sao Tome and Principe,Sao Tome and Principe,Sao Tomean
+Saudi Arabia,Saudi Arabia,Saudi
+Saudi Arabia,Saudi Arabia,Saudi Arabian
+United Kingdom,Scotland,Scots
+United Kingdom,Scotland,Scottish
+United Kingdom,Scotland,British
+Senegal,Senegal,Senegalese
+Serbia,Serbia,Serbian
+Seychelles,Seychelles,Seychellois
+Sierra Leone,Sierra Leone,Sierra Leonean
+Singapore,Singapore,Singapore
+Singapore,Singapore,Singaporean
+Sint Eustatius,Sint Eustatius,Sint Eustatius
+Sint Eustatius,Sint Eustatius,Statian
+Sint Maarten,Sint Maarten,Sint Maarten
+Slovakia,Slovakia,Slovak
+Slovenia,Slovenia,Slovenian
+Slovenia,Slovenia,Slovene
+Solomon Islands,Solomon Islands,Solomon Island
+Somalia,Somalia,Somali
+South Africa,South Africa,South African
+South Georgia and the South Sandwich Islands,South Georgia and the South Sandwich Islands,South Georgia
+South Georgia and the South Sandwich Islands,South Georgia and the South Sandwich Islands,South Sandwich Islands
+South Ossetia,South Ossetia,South Ossetian
+South Sudan,South Sudan,South Sudanese
+Spain,Spain,Spanish
+Sri Lanka,Sri Lanka,Sri Lankan
+Sudan,Sudan,Sudanese
+Surinam,Surinam,Surinamese
+Svalbard,Svalbard,Svalbard
+Swaziland,Swaziland,Swazi
+Sweden,Sweden,Swedish
+Switzerland,Switzerland,Swiss
+Syria,Syria,Syrian
+Tajikistan,Tajikistan,Tajikistani
+Tanzania,Tanzania,Tanzanian
+Thailand,Thailand,Thai
+Timor-Leste,Timor-Leste,Timorese
+Togo,Togo,Togolese
+Tokelau,Tokelau,Tokelauan
+Tonga,Tonga,Tongan
+Trinidad and Tobago,Trinidad and Tobago,Trinidadian
+Trinidad and Tobago,Trinidad and Tobago,Tobagonian
+Tunisia,Tunisia,Tunisian
+Turkey,Turkey,Turkish
+Turkmenistan,Turkmenistan,Turkmen
+Turks and Caicos Islands,Turks and Caicos Islands,Turks and Caicos Island
+Tuvalu,Tuvalu,Tuvaluan
+Uganda,Uganda,Ugandan
+Ukraine,Ukraine,Ukrainian
+United Arab Emirates,United Arab Emirates,Emirati
+United Arab Emirates,United Arab Emirates,Emirian
+United Arab Emirates,United Arab Emirates,Emiri
+United Kingdom,United Kingdom,British
+United States,United States,United States
+United States,United States,U.S.
+United States,United States,American
+Uruguay,Uruguay,Uruguayan
+Uzbekistan,Uzbekistan,Uzbekistani
+Uzbekistan,Uzbekistan,Uzbek
+Vanuatu,Vanuatu,Ni-Vanuatu
+Vanuatu,Vanuatu,Vanuatuan
+Vatican City State,Vatican City State,Vatican
+Venezuela,Venezuela,Venezuelan
+Vietnam,Vietnam,Vietnamese
+British Virgin Islands,British Virgin Islands,British Virgin Island
+U.S. Virgin Islands,United States Virgin Islands,U.S. Virgin Island
+United Kingdom,Wales,Welsh
+United Kingdom,Wales,British
+Wallis and Futuna,Wallis and Futuna,Wallis and Futuna
+Wallis and Futuna,Wallis and Futuna,Wallisian
+Wallis and Futuna,Wallis and Futuna,Futunan
+Western Sahara,Western Sahara,Sahrawi
+Western Sahara,Western Sahara,Sahrawian
+Western Sahara,Western Sahara,Sahraouian
+Yemen,Yemen,Yemeni
+Zambia,Zambia,Zambian
+Zimbabwe,Zimbabwe,Zimbabwean
+United States,United States,U.S.A
+United States,United States,USA
+North Korea,Democratic People's Republic of Korea,North Korean
+North Korea,DPRK,North Korean
