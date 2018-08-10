@@ -361,14 +361,13 @@ Another helpful feature is that regex constructs can be embedded in the tokens. 
 
 # Appendix C: Writing Customized Database Drivers
 
-Earlier in this file, we describes how a database driver can be specified in the `~/.cyobstract` configuration file (e.g., `db_driver: db1`). Cyobstract ships with two drivers that use different database schemas: `db1` and `db2`. The code for these two drivers, respectively, is in the following files:
+Earlier in this file, we describes how a database driver can be specified in the `~/.cyobstract` configuration file (e.g., `db_driver: db1`). Cyobstract ships with one drivers that uses a database schemas: `db1`.
 
 ```bash
 smoke/db/db_driver_1.py
-smoke/db/db_driver_2.py
 ```
 
-If neither of these two schemas suits your needs, you can add your own. The easiest way to start is to examine the code in those two files and modify it accordingly. There are are a three essential things to keep in mind:
+If this schema does not suits your needs, you can add your own. The easiest way to start is to examine the code in this files and modify it accordingly. There are are a three essential things to keep in mind:
 
 1. The driver module must live in the `smoke/db` directory, and the filename must begin with db_driver.
 
