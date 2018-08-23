@@ -23,7 +23,7 @@
 #
 # DM18-0345
 
-from __future__ import print_function
+#from __future__ import print_function
 
 import re, sys
 
@@ -35,10 +35,6 @@ def re_str_from_tokens(tokens):
     parts = _re_components_from_trie(_make_trie(tokens))
     for i, x in enumerate(parts):
         parts[i] = re.sub(r"(\\\s)+", r"\s+", x)
-        if re.search(r"\\\\", parts[i]):
-            print("OOPS1", file=sys.stderr)
-            print("   ", x, file=sys.stderr)
-            print("   ", parts[i], file=sys.stderr)
         if '|' in parts[i]:
             parts[i] = "(?:%s)" % parts[i]
     return r"(?:%s)" % '|'.join(parts)
@@ -76,7 +72,7 @@ def _re_components_from_trie(trie):
                               key=lambda x: -len(x))
             if len(suffixes) == 1:
                 if TRIE_END in t:
-                    #print "LEAF", prefix
+                    #print("LEAF", prefix)
                     if len(suffixes[0]) == 1:
                         prefixes.append("%s%s?" % (prefix, suffixes[0]))
                     else:
@@ -87,7 +83,7 @@ def _re_components_from_trie(trie):
             else:
                 suffixes = '|'.join(suffixes)
                 if TRIE_END in t:
-                    #print "LEAF", prefix
+                    #print("LEAF", prefix)
                     prefixes.append("%s(?:%s)?" % (prefix, suffixes))
                 else:
                     prefixes.append("%s(?:%s)" % (prefix, suffixes))
