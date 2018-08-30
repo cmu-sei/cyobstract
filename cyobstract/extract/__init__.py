@@ -148,6 +148,10 @@ def extract_observables(text):
     results = {}
     if not text:
         return results
+    try:
+        text = text.read()
+    except AttributeError:
+        pass
     text = decode_entities(text)
     for typ, regex in regexes.items():
         if callable(regex):
