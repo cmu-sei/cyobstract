@@ -1,0 +1,10 @@
+*~
+*.swp
+*.pyc
+dat
+log
+scratch
+tmp
+*.DS_Store
+cyobstract.egg-info
+*.idea
