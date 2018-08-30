@@ -86,4 +86,4 @@ ccs.difference_update(cc_ign)
 
 print(trie.re_str_from_tokens(ccs))
 
-print(repr(tuple(ccd.items())))
+print(repr(ccd))

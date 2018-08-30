@@ -544,7 +544,7 @@ def create_master_regexes_dict():
         for cc in _cc_pat.findall(text):
             # zap newlines, excessive whitespace
             cc = re.sub(r"\s+", " ", cc)
-            yield cc, re_auto.cc_lookup[cc]
+            yield cc, re_auto.cc_lookup[cc.lower()]
 
     regexes["cc"] = extract_cc
 
